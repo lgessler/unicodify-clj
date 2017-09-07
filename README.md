@@ -8,6 +8,8 @@ This is a program specifically designed to adapt `wget -r` dumps of old websites
 
 Then, `lein run`
 
+I haven't tested this on Windows. It'll probably break.
+
 ## License
 
 Copyright © 2017 Luke Gessler
