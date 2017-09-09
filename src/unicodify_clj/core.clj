@@ -40,14 +40,15 @@
              (strng/split fname #"\.")
              (last)
              (strng/lower-case))]
-    (when (and (not (.isDirectory f))
-               (= ext "html"))
-      (spit (str OUTPUT_PATH "/" fname)
-            (-> f
-                .toString
-                ts/parse
-                unicodify
-                hiccup/html)))))
+    (when (not (.isDirectory f))
+      (if (= ext "html")
+        (spit (str OUTPUT_PATH "/" fname)
+              (-> f
+                  .toString
+                  ts/parse
+                  unicodify
+                  hiccup/html))
+        (io/copy f (io/file (str OUTPUT_PATH "/" fname)))))))
 
 (defn- walk
   [path]
