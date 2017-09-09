@@ -12,7 +12,13 @@
   "Recursively called on xdvng nodes and their child DOM elements"
   [elt]
   (cond (coll? elt)
-        (into [(first elt) (second elt)] ;; ignore HTML elt and attrs
+        (into [;; keep the elt
+               (first elt)
+               ;; remove {:face "xdvng"} if present as an attr
+               (if (and (:face (second elt))
+                        (= (strng/lower-case (:face (second elt))) "xdvng"))
+                 (dissoc (second elt) :face)
+                 (second elt))]
               (->> elt rest rest (map transcode))) ;; call recursively on body
         (string? elt)
         (xc/xdvng-to-unicode elt) ;; text node that needs to be transcoded
