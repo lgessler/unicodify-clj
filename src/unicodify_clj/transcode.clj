@@ -71,11 +71,39 @@
 
 (def table (map vector xdvng-chars unicode-chars))
 
-
-;; Todo: fix chhoti i ki matra problem and others
-(defn xdvng-to-unicode
-  [s]
-  (reduce (fn [acc [k v]]
-            (clojure.string/replace acc k v))
+(defn- replace-normal-cases [s]
+  (reduce (fn [acc [k v]] (clojure.string/replace acc k v))
           s
           table))
+
+(defn transpose-i
+  [sl]
+  (cond (empty? sl) '()
+        (= (first sl) \e)
+        (if (nil? (second sl))
+          (cons \ि '())
+          (cons (second sl) (cons \ि (transpose-i (rest (rest sl))))))
+        :else (cons (first sl) (transpose-i (rest sl)))))
+
+(defn- slide-i
+  [s]
+  (reverse
+   (reduce (fn [acc c3]
+             (let [[c2 c1] (take 2 acc)]
+               (if (and (= c1 \ि)
+                        (= c2 \्))
+                 (conj (drop 2 acc) c2 c3 c1)
+                 (conj acc c3))))
+           '()
+           s)))
+
+(defn- fix-chhoti-i-ki-matra
+  [s]
+  (apply str (slide-i (transpose-i (seq s)))))
+
+
+(defn xdvng-to-unicode
+  [s]
+  (-> s
+      replace-normal-cases
+      fix-chhoti-i-ki-matra))
