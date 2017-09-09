@@ -10,13 +10,10 @@
 
 (defn- transcode
   [elt]
-  (if (coll? elt)
-    (list (first elt)
-          (second elt)
-          (map transcode (rest (rest elt))))
-    (if (string? elt)
-      (xc/xdvng-to-unicode elt)
-      elt)))
+  (cond (coll? elt) (into [(first elt) (second elt)]
+                          (->> elt rest rest (map transcode)))
+        (string? elt) (xc/xdvng-to-unicode elt)
+        :else elt))
 
 (defn- is-xdvng-node?
   [elt]
@@ -29,15 +26,14 @@
 (defn- unicodify
   "Takes in hiccup HTML"
   [elt]
-  (if (coll? elt)
-    (map (fn [elt]
-           (if (is-xdvng-node? elt)
-             (transcode elt)
-             (unicodify elt)))
-         elt)
-    elt))
+  (cond (vector? elt) (apply vector (map (fn [elt]
+                                           (if (is-xdvng-node? elt)
+                                             (transcode elt)
+                                             (unicodify elt)))
+                                         elt))
+        :else elt))
 
-(defn- process-file
+(defn process-file
   [f]
   (let [fname (last (strng/split (.toString f) #"/"))
         ext (->>
