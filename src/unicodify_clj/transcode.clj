@@ -83,7 +83,7 @@
   "Swaps the position of the first chhoti i and the character next to it"
   [sl]
   (cond (empty? sl) '()
-        (= (first sl) \e)
+        (or (= (first sl) \e) (= (first sl) \¡))
         (if (nil? (second sl))
           (cons \ि '())
           (cons (second sl) (cons \ि (transpose-i (rest (rest sl))))))
