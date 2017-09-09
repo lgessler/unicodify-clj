@@ -80,28 +80,34 @@
           table))
 
 (defn transpose-i
-  "Swaps the position of the first chhoti i and the character next to it"
+  "Swaps the position of the first chhoti i and the character next to it
+   \\e is a chhoti i, and \\¡ is a longer chhoti i that is used with conjuncts"
   [sl]
   (cond (empty? sl) '()
         (or (= (first sl) \e) (= (first sl) \¡))
         (if (nil? (second sl))
           (cons \ि '())
-          (cons (second sl) (cons \ि (transpose-i (rest (rest sl))))))
+          ;swap spots with char to right
+          (cons (second sl) (cons \ि (transpose-i (rest (rest sl)))))) 
         :else (cons (first sl) (transpose-i (rest sl)))))
 
 (defn- slide-i
   "Shifts the chhoti i until it's totally past the associated 'chunk'"
-  [s]
+  [sl]
   (reverse
    (reduce (fn [acc c3]
+             ;; Note that the list is the REVERSE of the string!
              (let [[c2 c1] (take 2 acc)]
-               (cond (or (and (= c1 \ि) (= c2 \्))
-                         (and (= c1 \ि) (= c2 \़))) (conj (drop 2 acc) c2 c3 c1)
-                     (or (and (= c2 \ि) (= c1 \्))
-                         (and (= c2 \ि) (= c1 \ý))) (conj (drop 2 acc) c1 c3 c2)
-                     :else (conj acc c3))))
+               (cond
+                 ;; You should never find the seq ि् or ि़ in real hindi--keep shifting
+                 (or (and (= c1 \ि) (= c2 \्))
+                     (and (= c1 \ि) (= c2 \़))) (conj (drop 2 acc) c2 c3 c1)
+                 ;; You should also never find ्ि or र्ि
+                 (or (and (= c2 \ि) (= c1 \्))
+                     (and (= c2 \ि) (= c1 \ý))) (conj (drop 2 acc) c1 c3 c2)
+                 :else (conj acc c3))))
            '()
-           s)))
+           sl)))
 
 (defn- fix-chhoti-i-ki-matra
   [s]

@@ -9,13 +9,18 @@
 (def OUTPUT_PATH "/tmp/malhar")
 
 (defn- transcode
+  "Recursively called on xdvng nodes and their child DOM elements"
   [elt]
-  (cond (coll? elt) (into [(first elt) (second elt)]
-                          (->> elt rest rest (map transcode)))
-        (string? elt) (xc/xdvng-to-unicode elt)
-        :else elt))
+  (cond (coll? elt)
+        (into [(first elt) (second elt)] ;; ignore HTML elt and attrs
+              (->> elt rest rest (map transcode))) ;; call recursively on body
+        (string? elt)
+        (xc/xdvng-to-unicode elt) ;; text node that needs to be transcoded
+        :else
+        elt))
 
 (defn- is-xdvng-node?
+  "Returns true if the element looks like [:font {:face \"xdvng\"} ...]"
   [elt]
   (and (coll? elt)
        (= (first elt) :font)
@@ -24,7 +29,8 @@
        (= (strng/lower-case (:face (second elt))) "xdvng")))
 
 (defn- unicodify
-  "Takes in hiccup HTML"
+  "Takes in a hiccup representation of the document and recursively finds
+   text nodes that need to be transcoded"
   [elt]
   (cond (vector? elt) (apply vector (map (fn [elt]
                                            (if (is-xdvng-node? elt)
