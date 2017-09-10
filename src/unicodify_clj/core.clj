@@ -66,8 +66,8 @@
   [path]
   (doall
    (map #(do
-           (process-file %)
-           (println "Processed file" (.toString %)))
+           (println "Processing file" (.toString %))
+           (process-file %))
         (file-seq (io/file path))))
   :ok)
 
