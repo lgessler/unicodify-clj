@@ -34,14 +34,21 @@
        (:face (second elt))
        (= (strng/lower-case (:face (second elt))) "xdvng")))
 
+(defn- fix-bad-idiosyncrasies
+  [elt]
+  (cond (and (vector? elt)
+             (#{:c} (first elt))) (assoc elt 0 :center)
+        :else elt))
+
 (defn- unicodify
   "Takes in a hiccup representation of the document and recursively finds
    text nodes that need to be transcoded"
   [elt]
   (cond (vector? elt) (apply vector (map (fn [elt]
-                                           (if (is-xdvng-node? elt)
-                                             (transcode elt)
-                                             (unicodify elt)))
+                                           (let [elt (fix-bad-idiosyncrasies elt)]
+                                             (if (is-xdvng-node? elt)
+                                               (transcode elt)
+                                               (unicodify elt))))
                                          elt))
         :else elt))
 
