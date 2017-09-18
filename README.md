@@ -6,9 +6,9 @@ This is a program specifically designed to adapt `wget -r` dumps of old websites
 
 **First**, modify the variables in unicodify-clj.core to suit your machine. `INPUT_PATH` should point to the root dir of where your `wget -r http://www.hindi-urdu-malhar.org` output was put.
 
-Then, `lein run`
+Then, `lein run`. (Get [Leiningen](https://leiningen.org/).)
 
-I haven't tested this on Windows. It'll probably break.
+I haven't tested this on Windows. It probably won't work without changes.
 
 ## License
 
