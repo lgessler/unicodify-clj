@@ -127,8 +127,3 @@
                         fix-ra-anusvara)]
     (print-ascii-chars-found unicodified)
     unicodified))
-
-
-;; todo:
-;; line 80 in aavanchit
-;; no transcode in the ghazals
