@@ -7,6 +7,7 @@
             [unicodify-clj.transcode :as xc]))
 
 (def INPUT_PATH "/home/luke/Sync/playground/malhar/www.hindi-urdu-malhar.org/")
+(def TEST_PATH "/home/luke/Sync/playground/malhar/test/")
 (def OUTPUT_PATH "/tmp/malhar")
 
 (defn- transcode
@@ -76,6 +77,7 @@
       DIRTY-fix-quotes
       hickory/parse
       hickory/as-hiccup
+      first
       unicodify
       hiccup/html))
 
@@ -102,4 +104,5 @@
 
 (defn -main
   []
+  #_(walk TEST_PATH)
   (walk INPUT_PATH))
