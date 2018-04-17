@@ -55,13 +55,14 @@
 
 (defn- DIRTY-strip-out-p-tags
   "Sometimes a file contains a <p> tag that is not closed (e.g.
-  mirdardinaa%5E.html). This causes the parser to sloppily infer
+  mirdardinaa^.html). This causes the parser to sloppily infer
   where the </p> should go, which causes transcoding issues. This
   is an attempt to get rid of these."
   [s]
   (if (and (clojure.string/includes? s "<p>")
            (not (clojure.string/includes? s "</p>")))
-    (clojure.string/replace s #"(<p>\s*)+(\r\n|\r|\n)" "\n")
+    ;(clojure.string/replace s #"(<p>\s*)+(\r\n|\r|\n)" "\n")
+    (clojure.string/replace s #"<p>" "<br/>")
     s))
 
 (defn- DIRTY-fix-quotes
