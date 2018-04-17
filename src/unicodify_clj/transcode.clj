@@ -120,12 +120,15 @@
                  (str " (" c ")")
                  (str " in this passage:\n\n\t" s))))))
 
+(defn- unicodify [s]
+  (-> s
+      replace-normal-cases
+      fix-ra
+      fix-ra-anusvara
+      fix-chhoti-i-ki-matra))
+
 (defn xdvng-to-unicode
   [s]
-  (let [unicodified (-> s
-                        replace-normal-cases
-                        fix-chhoti-i-ki-matra
-                        fix-ra
-                        fix-ra-anusvara)]
+  (let [unicodified (unicodify s)]
     (print-ascii-chars-found unicodified)
     unicodified))
