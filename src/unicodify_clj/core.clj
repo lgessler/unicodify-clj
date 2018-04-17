@@ -1,11 +1,12 @@
 (ns unicodify-clj.core
   (:require [clojure.java.io :as io]
+            [hickory.core :as hickory]
             [pl.danieljanus.tagsoup :as ts]
             [hiccup.core :as hiccup]
             [clojure.string :as strng]
             [unicodify-clj.transcode :as xc]))
 
-(def INPUT_PATH "/Users/lukegessler/play/malhar/www.hindi-urdu-malhar.org/")
+(def INPUT_PATH "/home/luke/Sync/playground/malhar/www.hindi-urdu-malhar.org/")
 (def OUTPUT_PATH "/tmp/malhar")
 
 (defn- transcode
@@ -52,6 +53,31 @@
                                          elt))
         :else elt))
 
+(defn- DIRTY-strip-out-p-tags
+  "Sometimes a file contains a <p> tag that is not closed (e.g.
+  mirdardinaa%5E.html). This causes the parser to sloppily infer
+  where the </p> should go, which causes transcoding issues. This
+  is an attempt to get rid of these."
+  [s]
+  (if (and (clojure.string/includes? s "<p>")
+           (not (clojure.string/includes? s "</p>")))
+    (clojure.string/replace s #"(<p>\s*)+(\r\n|\r|\n)" "\n")
+    s))
+
+(defn- DIRTY-fix-quotes
+  [s]
+  (clojure.string/replace s #"(?i)face=xdvng" "face=\"Xdvng\""))
+
+(defn- transcode-file-string
+  [s]
+  (-> s
+      DIRTY-strip-out-p-tags
+      DIRTY-fix-quotes
+      hickory/parse
+      hickory/as-hiccup
+      unicodify
+      hiccup/html))
+
 (defn process-file
   [f]
   (let [fname (last (strng/split (.toString f) #"/"))
@@ -62,23 +88,17 @@
     (when (not (.isDirectory f))
       (if (= ext "html")
         (spit (str OUTPUT_PATH "/" fname)
-              (-> f
-                  .toString
-                  ts/parse
-                  unicodify
-                  hiccup/html))
+              (transcode-file-string (slurp f)))
         (io/copy f (io/file (str OUTPUT_PATH "/" fname)))))))
 
 (defn- walk
   [path]
-  (doall
-   (map #(do
-           (println "Processing file" (.toString %))
-           (process-file %))
-        (file-seq (io/file path))))
+
+  (doseq [file (file-seq (io/file path))]
+    (println "Processing file" (.toString file))
+    (process-file file))
   :ok)
 
 (defn -main
   []
   (walk INPUT_PATH))
-
