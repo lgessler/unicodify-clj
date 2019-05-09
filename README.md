@@ -1,10 +1,10 @@
 # unicodify-clj
 
-This is a program specifically designed to adapt `wget -r` dumps of old websites with the legacy Devanagari encoding XDVNG so that they use unicode instead. It has only been tested on the contents of [Malhar](http://www.hindi-urdu-malhar.org).
+This is a program specifically designed to adapt `wget -r` dumps of old websites with the legacy Devanagari encoding XDVNG so that they use unicode instead. It has only been tested on the contents of [Malhar](https://lgessler.com/malhar/).
 
 ## Usage
 
-**First**, modify the variables in unicodify-clj.core to suit your machine. `INPUT_PATH` should point to the root dir of where your `wget -r http://www.hindi-urdu-malhar.org` output was put.
+**First**, modify the variables in unicodify-clj.core to suit your machine. `INPUT_PATH` should point to the root dir of where your `wget -r https://lgessler.com/malhar/` output was put.
 
 Then, `lein run`. (Get [Leiningen](https://leiningen.org/).)
 
